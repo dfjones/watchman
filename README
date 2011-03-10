@@ -1,0 +1,5 @@
+Simple utility that watches files/directories for changes and performs an action when they change.
+
+I'm sure this is reinventing 100 other, better tools.
+
+This README is also a bit optimistic, since a single line of code hasn't been written yet.
