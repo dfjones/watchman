@@ -1,6 +1,8 @@
-Simple utility that watches files/directories for changes and performs an action when they change.
+Simple utility that watches files/directories for changes and performs an action when they change. Inspired (and partially based on) the coffee-script compiler.
 
 I'm sure this is reinventing 100 other, better tools.
+
+Yes I wrote it in coffee-script and NodeJS. Does that make me hip now?
 
 Examples:
 
