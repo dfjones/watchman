@@ -21,7 +21,8 @@ drwxrwxr-x   5 doug  doug   170B Mar 10 23:26 .vimbackup
 drwxr-xr-x   5 doug  doug   170B Mar 10 22:54 test
 -rwxr-xr-x   1 doug  doug   1.2K Mar 10 23:27 watchman
 
-Works with directories
+Works with directories too!
+
 ./watchman test "echo 'hello world'"
 watching: test/bar
 watching: test/foo
