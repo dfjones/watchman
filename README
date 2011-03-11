@@ -2,4 +2,30 @@ Simple utility that watches files/directories for changes and performs an action
 
 I'm sure this is reinventing 100 other, better tools.
 
-This README is also a bit optimistic, since a single line of code hasn't been written yet.
+Examples:
+
+./watchman watchman "ls -lah"
+watching: watchman
+File changed: watchman
+
+total 64
+drwxr-xr-x   9 doug  doug   306B Mar 10 23:26 .
+drwxr-xr-x@ 22 doug  doug   748B Mar 10 00:35 ..
+-rw-r--r--   1 doug  doug    12K Mar 10 23:27 .README.swp
+drwxr-xr-x  14 doug  doug   476B Mar 10 23:27 .git
+drwxrwxr-x   5 doug  doug   170B Mar 10 23:26 .vimbackup
+-rw-r--r--   1 doug  doug    12K Mar 10 23:25 .watchman.swp
+-rw-r--r--   1 doug  doug   155B Mar 10 23:26 README
+drwxr-xr-x   5 doug  doug   170B Mar 10 22:54 test
+-rwxr-xr-x   1 doug  doug   1.2K Mar 10 23:27 watchman
+
+Works with directories
+./watchman test "echo 'hello world'"
+watching: test/bar
+watching: test/foo
+File changed: test/foo
+
+hello world
+
+
+

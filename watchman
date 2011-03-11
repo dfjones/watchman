@@ -1,0 +1,44 @@
+#!/usr/bin/env coffee
+
+cli = require 'cli'
+fs = require 'fs'
+path = require 'path'
+exec = require 'child_process'
+exec = exec.exec
+
+cli.setUsage('watchman [options] target action')
+
+cli.parse({
+  "ignore-hidden": ['i', "Do not watch hidden files"]
+})
+
+cli.main (args, options) ->
+  if args.length < 2
+    console.log "Please specify a target and action"
+    return
+
+  target = args[0]
+  action = args[1]
+
+  watcher = (file) ->
+    console.log("watching: #{file}")
+    fs.watchFile file, {persistent: true, interval: 500}, (curr, prev) ->
+      return if curr.size is prev.size and curr.mtime.getTime() is prev.mtime.getTime()
+      console.log("File changed: " + file)
+      exec action, (error, stdout, stderr) ->
+        console.log(stderr)
+        console.log(stdout)
+
+  testHidden = (file) -> options["ignore-hidden"] and file[0] is '.'
+
+  find_files = (target) ->
+    path.exists target, (exists) ->
+      throw new "Target file not found: #{target}" if not exists
+      fs.stat target, (err, stats) ->
+        if stats.isDirectory()
+          fs.readdir target, (err, files) ->
+            find_files(target + "/" + file) for file in files when not testHidden(file)
+        else
+          watcher(target) if not testHidden(target)
+
+  find_files(target, '.')
