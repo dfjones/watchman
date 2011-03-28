@@ -1,6 +1,8 @@
-Simple utility that watches files/directories for changes and performs an action when they change.
+Simple utility that watches files/directories for changes and performs an action when they change. Inspired (and partially based on) the coffee-script compiler.
 
 I'm sure this is reinventing 100 other, better tools.
+
+Yes I wrote it in coffee-script and NodeJS. Does that make me hip now?
 
 Examples:
 
@@ -19,7 +21,8 @@ drwxrwxr-x   5 doug  doug   170B Mar 10 23:26 .vimbackup
 drwxr-xr-x   5 doug  doug   170B Mar 10 22:54 test
 -rwxr-xr-x   1 doug  doug   1.2K Mar 10 23:27 watchman
 
-Works with directories
+Works with directories too!
+
 ./watchman test "echo 'hello world'"
 watching: test/bar
 watching: test/foo
