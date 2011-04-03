@@ -29,6 +29,8 @@ cli.main (args, options) ->
   target = args[0]
   action = args[1]
 
+  watched = {}
+
   useQueue = false
   actionQueue = []
 
@@ -49,6 +51,8 @@ cli.main (args, options) ->
       winston.info("stdout: " + stdout)
 
   watcher = (file) ->
+    return if file of watched
+    watched[file] = true
     winston.info("watching: #{file}")
     fs.watchFile file, {persistent: true, interval: 500}, (curr, prev) ->
       return if curr.size is prev.size and curr.mtime.getTime() is prev.mtime.getTime()
@@ -57,6 +61,14 @@ cli.main (args, options) ->
         queueAction()
       else
         execAction()
+
+  directoryWatcher = (dir) ->
+    return if dir of watched
+    watched[dir] = true
+    winston.info("watching directory: #{dir}")
+    fs.watchFile dir, {persistent: true, interval: 500}, (curr, prev) ->
+      winston.info("Directory changed: #{dir}, looking for new files")
+      find_files(dir)
 
   testHidden = (file) -> options["ignore-hidden"] and file[0] is '.'
 
@@ -71,9 +83,10 @@ cli.main (args, options) ->
       throw new "Target file not found: #{target}" if not exists
       fs.stat target, (err, stats) ->
         if stats.isDirectory()
+          directoryWatcher(target)
           fs.readdir target, (err, files) ->
             find_files(target + "/" + file) for file in files when not testHidden(file)
         else
           watcher(target) if not testHidden(target)
 
-  find_files(target, '.')
+  find_files(target)

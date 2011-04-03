@@ -13,7 +13,7 @@
     "queue-size": ['q', "Action queue size", "int", 1]
   });
   cli.main(function(args, options) {
-    var action, actionQueue, execAction, execFromQueue, find_files, queueAction, rate, rateMap, target, testHidden, useQueue, watcher;
+    var action, actionQueue, directoryWatcher, execAction, execFromQueue, find_files, queueAction, rate, rateMap, target, testHidden, useQueue, watched, watcher;
     if (args.length < 2) {
       console.log("Please specify a target and action");
       return;
@@ -25,6 +25,7 @@
     };
     target = args[0];
     action = args[1];
+    watched = {};
     useQueue = false;
     actionQueue = [];
     queueAction = function() {
@@ -49,6 +50,10 @@
       });
     };
     watcher = function(file) {
+      if (file in watched) {
+        return;
+      }
+      watched[file] = true;
       winston.info("watching: " + file);
       return fs.watchFile(file, {
         persistent: true,
@@ -63,6 +68,20 @@
         } else {
           return execAction();
         }
+      });
+    };
+    directoryWatcher = function(dir) {
+      if (dir in watched) {
+        return;
+      }
+      watched[dir] = true;
+      winston.info("watching directory: " + dir);
+      return fs.watchFile(dir, {
+        persistent: true,
+        interval: 500
+      }, function(curr, prev) {
+        winston.info("Directory changed: " + dir + ", looking for new files");
+        return find_files(dir);
       });
     };
     testHidden = function(file) {
@@ -81,6 +100,7 @@
         }
         return fs.stat(target, function(err, stats) {
           if (stats.isDirectory()) {
+            directoryWatcher(target);
             return fs.readdir(target, function(err, files) {
               var file, _i, _len, _results;
               _results = [];
@@ -100,6 +120,6 @@
         });
       });
     };
-    return find_files(target, '.');
+    return find_files(target);
   });
 }).call(this);
