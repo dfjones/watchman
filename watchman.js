@@ -9,7 +9,8 @@
   cli.setUsage('watchman [options] target action');
   cli.parse({
     "ignore-hidden": ['i', "Do not watch hidden files"],
-    "rate-limit": ['r', "Rate limit actions", "string", null]
+    "rate-limit": ['r', "Rate limit actions", "string", null],
+    "queue-size": ['q', "Action queue size", "int", 1]
   });
   cli.main(function(args, options) {
     var action, actionQueue, execAction, execFromQueue, find_files, queueAction, rate, rateMap, target, testHidden, useQueue, watcher;
@@ -27,7 +28,7 @@
     useQueue = false;
     actionQueue = [];
     queueAction = function() {
-      if (actionQueue.length === 0) {
+      if (actionQueue.length < options["queue-size"]) {
         return actionQueue.push(action);
       }
     };
