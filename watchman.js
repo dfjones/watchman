@@ -80,7 +80,6 @@
         persistent: true,
         interval: 500
       }, function(curr, prev) {
-        winston.info("Directory changed: " + dir + ", looking for new files");
         return find_files(dir);
       });
     };

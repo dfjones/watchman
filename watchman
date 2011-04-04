@@ -67,7 +67,6 @@ cli.main (args, options) ->
     watched[dir] = true
     winston.info("watching directory: #{dir}")
     fs.watchFile dir, {persistent: true, interval: 500}, (curr, prev) ->
-      winston.info("Directory changed: #{dir}, looking for new files")
       find_files(dir)
 
   testHidden = (file) -> options["ignore-hidden"] and file[0] is '.'
