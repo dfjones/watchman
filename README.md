@@ -51,7 +51,7 @@ Not only that, but it will find new files in any watched directory!
     Tue Apr 12 2011 23:08:30 - watching: test/file3
     Tue Apr 12 2011 23:08:30 - watching: test/foo
 
-Later after adding the file...
+Later after adding "newFile"...
 
     Tue Apr 12 2011 23:08:36 - watching: test/newFile
 
