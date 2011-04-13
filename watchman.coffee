@@ -3,7 +3,6 @@
 cli = require 'cli'
 fs = require 'fs'
 path = require 'path'
-winston = require 'winston'
 exec = require 'child_process'
 exec = exec.exec
 
@@ -14,6 +13,14 @@ cli.parse({
   "rate": ['r', "Rate limit actions [like Ns, Nm, Nh, N is int]", "string", null],
   "queue": ['q', "Action queue size", "number", 1]
 })
+
+getFormattedDate = () ->
+  d = new Date()
+  s = "#{ d.toDateString() } #{ d.toTimeString().split(" ")[0] }"
+
+log = (s) ->
+  d = getFormattedDate()
+  console.log(d + " - " + s)
 
 cli.main (args, options) ->
   if args.length < 2
@@ -45,18 +52,18 @@ cli.main (args, options) ->
 
   execAction = (toExec) ->
     toExec ?= action
-    winston.info("Running action...")
+    log("Running action...")
     exec toExec, (error, stdout, stderr) ->
-      winston.info("stderr: " + stderr)
-      winston.info("stdout: " + stdout)
+      log("stderr: " + stderr)
+      log("stdout: " + stdout)
 
   watcher = (file) ->
     return if file of watched
     watched[file] = true
-    winston.info("watching: #{file}")
+    log("watching: #{file}")
     fs.watchFile file, {persistent: true, interval: 500}, (curr, prev) ->
       return if curr.size is prev.size and curr.mtime.getTime() is prev.mtime.getTime()
-      winston.info("File changed: " + file)
+      log("File changed: " + file)
       if useQueue
         queueAction()
       else
@@ -65,7 +72,7 @@ cli.main (args, options) ->
   directoryWatcher = (dir) ->
     return if dir of watched
     watched[dir] = true
-    winston.info("watching directory: #{dir}")
+    log("watching directory: #{dir}")
     fs.watchFile dir, {persistent: true, interval: 500}, (curr, prev) ->
       find_files(dir)
 
