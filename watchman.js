@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 (function() {
   var cli, exec, fs, getFormattedDate, log, path;
   cli = require('cli');
