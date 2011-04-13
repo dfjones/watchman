@@ -55,3 +55,7 @@ Later after adding "newFile"...
 
     Tue Apr 12 2011 23:08:36 - watching: test/newFile
 
+Install
+--------
+
+    npm install watchman
