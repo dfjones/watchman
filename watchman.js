@@ -89,7 +89,7 @@
         persistent: true,
         interval: 500
       }, function(curr, prev) {
-        return find_files(dir);
+        return find_files(dir, true);
       });
     };
     testHidden = function(file) {
@@ -106,13 +106,17 @@
       }
       setInterval(execFromQueue, rate);
     }
-    find_files = function(target) {
+    find_files = function(target, quiet) {
       return path.exists(target, function(exists) {
-        if (!exists) {
+        if (!quiet && !exists) {
           throw "Target file not found: " + target;
         }
         return fs.stat(target, function(err, stats) {
-          if (stats.isDirectory()) {
+          if (err != null) {
+            console.log(err + " for target: " + target);
+            return;
+          }
+          if ((stats != null) && stats.isDirectory()) {
             directoryWatcher(target);
             return fs.readdir(target, function(err, files) {
               var file, _i, _len, _results;
