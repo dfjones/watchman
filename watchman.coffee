@@ -74,7 +74,7 @@ cli.main (args, options) ->
     watched[dir] = true
     log("watching directory: #{dir}")
     fs.watchFile dir, {persistent: true, interval: 500}, (curr, prev) ->
-      find_files(dir)
+      find_files(dir, true)
 
   testHidden = (file) -> options["ignore-hidden"] and file[0] is '.'
 
@@ -88,9 +88,9 @@ cli.main (args, options) ->
       return
     setInterval(execFromQueue, rate)
 
-  find_files = (target) ->
+  find_files = (target, quiet) ->
     path.exists target, (exists) ->
-      throw "Target file not found: #{target}" if not exists
+      throw "Target file not found: #{target}" if not quiet and not exists
       fs.stat target, (err, stats) ->
         if err?
           console.log(err + " for target: " + target)
