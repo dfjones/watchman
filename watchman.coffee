@@ -90,9 +90,12 @@ cli.main (args, options) ->
 
   find_files = (target) ->
     path.exists target, (exists) ->
-      throw new "Target file not found: #{target}" if not exists
+      throw "Target file not found: #{target}" if not exists
       fs.stat target, (err, stats) ->
-        if stats.isDirectory()
+        if err?
+          console.log(err + " for target: " + target)
+          return
+        if stats? and stats.isDirectory()
           directoryWatcher(target)
           fs.readdir target, (err, files) ->
             find_files(target + "/" + file) for file in files when not testHidden(file)

@@ -114,7 +114,11 @@
           throw "Target file not found: " + target;
         }
         return fs.stat(target, function(err, stats) {
-          if (stats.isDirectory()) {
+          if (err != null) {
+            console.log(err + " for target: " + target);
+            return;
+          }
+          if ((stats != null) && stats.isDirectory()) {
             directoryWatcher(target);
             return fs.readdir(target, function(err, files) {
               var file, _i, _len, _results;
