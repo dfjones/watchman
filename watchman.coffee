@@ -74,7 +74,10 @@ cli.main (args, options) ->
     watched[dir] = true
     log("watching directory: #{dir}")
     fs.watchFile dir, {persistent: true, interval: 500}, (curr, prev) ->
-      find_files(dir, true)
+      try
+        find_files(dir, true)
+      catch error
+        log("Error while watching dir #{dir}: #{error}")
 
   testHidden = (file) -> options["ignore-hidden"] and file[0] is '.'
 
@@ -102,4 +105,7 @@ cli.main (args, options) ->
         else
           watcher(target) if not testHidden(target)
 
-  find_files(target)
+  try
+    find_files(target)
+  catch error
+    log("Error: #{error}")

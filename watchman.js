@@ -51,7 +51,11 @@
       return actionQueue = [];
     };
     execAction = function(toExec) {
-      toExec != null ? toExec : toExec = action;
+            if (toExec != null) {
+        toExec;
+      } else {
+        toExec = action;
+      };
       log("Running action...");
       return exec(toExec, function(error, stdout, stderr) {
         log("stderr: " + stderr);
@@ -89,7 +93,11 @@
         persistent: true,
         interval: 500
       }, function(curr, prev) {
-        return find_files(dir, true);
+        try {
+          return find_files(dir, true);
+        } catch (error) {
+          return log("Error while watching dir " + dir + ": " + error);
+        }
       });
     };
     testHidden = function(file) {
@@ -137,6 +145,10 @@
         });
       });
     };
-    return find_files(target);
+    try {
+      return find_files(target);
+    } catch (error) {
+      return log("Error: " + error);
+    }
   });
 }).call(this);
