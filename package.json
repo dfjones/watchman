@@ -1,6 +1,6 @@
 { "name": "watchman",
   "description": "A simple utility to watch files/directories and perform an action when they change.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "homepage": "http://github.com/dfjones/watchman",
   "keywords": ["file", "filesystem", "change", "command line"],
   "author": "Doug Jones <doug@dfjones.net>",

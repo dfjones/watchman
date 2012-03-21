@@ -1,26 +1,37 @@
 (function() {
   var cli, exec, fs, getFormattedDate, log, path;
+
   cli = require('cli');
+
   fs = require('fs');
+
   path = require('path');
+
   exec = require('child_process');
+
   exec = exec.exec;
+
   cli.setUsage('watchman [options] target action');
+
   cli.parse({
     "ignore-hidden": ['i', "Do not watch hidden files"],
     "rate": ['r', "Rate limit actions [like Ns, Nm, Nh, N is int]", "string", null],
-    "queue": ['q', "Action queue size", "number", 1]
+    "queue": ['q', "Action queue size", "number", 1],
+    "watch-first": ['w', "Perform the action only when there is a change. Otherwise, action is executed once immediately"]
   });
+
   getFormattedDate = function() {
     var d, s;
     d = new Date();
     return s = "" + (d.toDateString()) + " " + (d.toTimeString().split(" ")[0]);
   };
+
   log = function(s) {
     var d;
     d = getFormattedDate();
     return console.log(d + " - " + s);
   };
+
   cli.main(function(args, options) {
     var action, actionQueue, directoryWatcher, execAction, execFromQueue, find_files, queueAction, rate, rateMap, target, testHidden, useQueue, watched, watcher;
     if (args.length < 2) {
@@ -38,9 +49,7 @@
     useQueue = false;
     actionQueue = [];
     queueAction = function() {
-      if (actionQueue.length < options["queue"]) {
-        return actionQueue.push(action);
-      }
+      if (actionQueue.length < options["queue"]) return actionQueue.push(action);
     };
     execFromQueue = function() {
       var a, _i, _len;
@@ -51,11 +60,7 @@
       return actionQueue = [];
     };
     execAction = function(toExec) {
-            if (toExec != null) {
-        toExec;
-      } else {
-        toExec = action;
-      };
+      if (toExec == null) toExec = action;
       log("Running action...");
       return exec(toExec, function(error, stdout, stderr) {
         log("stderr: " + stderr);
@@ -63,9 +68,7 @@
       });
     };
     watcher = function(file) {
-      if (file in watched) {
-        return;
-      }
+      if (file in watched) return;
       watched[file] = true;
       log("watching: " + file);
       return fs.watchFile(file, {
@@ -84,9 +87,7 @@
       });
     };
     directoryWatcher = function(dir) {
-      if (dir in watched) {
-        return;
-      }
+      if (dir in watched) return;
       watched[dir] = true;
       log("watching directory: " + dir);
       return fs.watchFile(dir, {
@@ -116,9 +117,7 @@
     }
     find_files = function(target, quiet) {
       return path.exists(target, function(exists) {
-        if (!quiet && !exists) {
-          throw "Target file not found: " + target;
-        }
+        if (!quiet && !exists) throw "Target file not found: " + target;
         return fs.stat(target, function(err, stats) {
           if (err != null) {
             console.log(err + " for target: " + target);
@@ -138,17 +137,23 @@
               return _results;
             });
           } else {
-            if (!testHidden(target)) {
-              return watcher(target);
-            }
+            if (!testHidden(target)) return watcher(target);
           }
         });
       });
     };
     try {
-      return find_files(target);
+      find_files(target);
     } catch (error) {
-      return log("Error: " + error);
+      log("Error: " + error);
+    }
+    if (!options["watch-first"]) {
+      if (useQueue) {
+        return queueAction();
+      } else {
+        return execAction();
+      }
     }
   });
+
 }).call(this);

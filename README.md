@@ -55,6 +55,8 @@ Later after adding "newFile"...
 
     Tue Apr 12 2011 23:08:36 - watching: test/newFile
 
+By default, Watchman will perform the action immediately upon running. To prevent this, pass -w as an option.
+
 Install
 --------
 

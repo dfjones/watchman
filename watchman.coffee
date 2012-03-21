@@ -11,7 +11,8 @@ cli.setUsage('watchman [options] target action')
 cli.parse({
   "ignore-hidden": ['i', "Do not watch hidden files"],
   "rate": ['r', "Rate limit actions [like Ns, Nm, Nh, N is int]", "string", null],
-  "queue": ['q', "Action queue size", "number", 1]
+  "queue": ['q', "Action queue size", "number", 1],
+  "watch-first": ['w', "Perform the action only when there is a change. Otherwise, action is executed once immediately"]
 })
 
 getFormattedDate = () ->
@@ -109,3 +110,10 @@ cli.main (args, options) ->
     find_files(target)
   catch error
     log("Error: #{error}")
+
+  if not options["watch-first"]
+    if useQueue
+      queueAction()
+    else
+      execAction()
+
