@@ -116,7 +116,7 @@
       setInterval(execFromQueue, rate);
     }
     find_files = function(target, quiet) {
-      return path.exists(target, function(exists) {
+      return fs.exists(target, function(exists) {
         if (!quiet && !exists) throw "Target file not found: " + target;
         return fs.stat(target, function(err, stats) {
           if (err != null) {
