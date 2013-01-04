@@ -1,6 +1,7 @@
 #!/usr/bin/env coffee
 
 cli = require 'cli'
+eco = require 'eco'
 fs = require 'fs'
 path = require 'path'
 exec = require 'child_process'
@@ -42,21 +43,29 @@ cli.main (args, options) ->
   useQueue = false
   actionQueue = []
 
-  queueAction = ->
+  queueAction = (action, file) ->
     if actionQueue.length < options["queue"]
-      actionQueue.push(action)
+      actionQueue.push([action, file])
 
   execFromQueue = ->
     for a in actionQueue
-      execAction(a)
+      execAction(a[0], a[1])
     actionQueue = []
 
-  execAction = (toExec) ->
+  execAction = (toExec, file) ->
     toExec ?= action
+    toExec = eco.render(toExec, {file})
     log("Running action...")
     exec toExec, (error, stdout, stderr) ->
       log("stderr: " + stderr)
       log("stdout: " + stdout)
+
+  onFileChange = (file) ->
+    log("File changed: " + file)
+    if useQueue
+      queueAction(action, file)
+    else
+      execAction(action, file)
 
   watcher = (file) ->
     return if file of watched
@@ -64,11 +73,7 @@ cli.main (args, options) ->
     log("watching: #{file}")
     fs.watchFile file, {persistent: true, interval: 500}, (curr, prev) ->
       return if curr.size is prev.size and curr.mtime.getTime() is prev.mtime.getTime()
-      log("File changed: " + file)
-      if useQueue
-        queueAction()
-      else
-        execAction()
+      onFileChange(file)
 
   directoryWatcher = (dir) ->
     return if dir of watched
@@ -93,7 +98,7 @@ cli.main (args, options) ->
     setInterval(execFromQueue, rate)
 
   find_files = (target, quiet) ->
-    path.exists target, (exists) ->
+    fs.exists target, (exists) ->
       throw "Target file not found: #{target}" if not quiet and not exists
       fs.stat target, (err, stats) ->
         if err?

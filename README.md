@@ -3,9 +3,7 @@ Watchman
 
 Simple utility that watches files/directories for changes and performs an action when they change. Inspired (and partially based on) the coffee-script compiler.
 
-I'm sure this is reinventing 100 other, better tools.
-
-Yes I wrote it in coffee-script and NodeJS. Does that make me hip now?
+Yes, I wrote it in coffee-script and NodeJS. Does that make me hip now?
 
 (Calm down, you don't need coffee-script to run it.)
 
@@ -55,7 +53,26 @@ Later after adding "newFile"...
 
     Tue Apr 12 2011 23:08:36 - watching: test/newFile
 
+Even better, the action is an [eco](https://github.com/sstephenson/eco) template!
+
+    ./watchman test "echo 'The file <%= @file %> changed!'"
+    Thu Jan 03 2013 22:47:35 - watching directory: test
+    Thu Jan 03 2013 22:47:35 - watching: test/foo
+    Thu Jan 03 2013 22:48:17 - Running action...
+    Thu Jan 03 2013 22:48:17 - stderr: 
+    Thu Jan 03 2013 22:48:17 - stdout: The file test/foo changed
+
 By default, Watchman will perform the action immediately upon running. To prevent this, pass -w as an option.
+
+About Actions
+-------------
+
+The action you specify will be exec'ed in a shell with the same working directory as watchman. The action string is actually a template
+for [eco](https://github.com/sstephenson/eco). Currently, the context provided to the action template is simply:
+```
+{file: '/file/that/changed'}
+```
+
 
 Install
 --------
